@@ -20,25 +20,22 @@ const Photo = mongoose.model('Photo', PhotoSchema);
 
 // Create a photo
 // Şimdi veritabanımıza ilk veriyi oluşturacağız
-/* 
 Photo.create({
   title: 'Photo Title 1',
   description: 'Photo Description Lorem Ipsum 1',
 }); 
-*/
+
 
 // Read a photo
 // Verileri console.log'a yazdıralım
-/* 
 Photo.find({}, (err, data) => {
   console.log(data);
 }); 
-*/
+
 
 // Update a photo
 // id'yi MongoDB Compass aracında kendisi uniqe olarak veriyor.
 // "Photos" collection'ı içinden değiştirmek istediğimin veriye bakarak ObjectId'yi buldum.
-/*
 const id = '635291d26af821d138e7007c';
 Photo.findByIdAndUpdate(
   id,
@@ -53,7 +50,7 @@ Photo.findByIdAndUpdate(
     console.log(data);
   }
 );
-*/
+
 // new: true kodunu eklemez isek, bize console.log'da gösterdiği data "eski data" olur, güncellenmiş datayı "MongoDB Compass" aracından görebiliriz.
 
 // Delete a photo
