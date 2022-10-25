@@ -48,6 +48,19 @@ app.get('/', async (req, res) => {
   });
 });
 
+app.get('/photos/:id', async (req, res) => {
+  // console.log(req.params.id); // id'yi console'a yazdırdık
+
+  const photo = await Photo.findById(req.params.id);
+  // id'yi çektikten sonra ilgili template'e yönlendireceğiz (photo.ejs)
+  // templete olarak 'photo'ya girecek, bu template'e aşağıda oluşturduğum photo bilgisini gönderecek.
+  // photo bilgisi = id'si yardımıyla bulduğum fotoğraf
+  // Bu şekilde her bir özel fotoğraf sayfasına ilgili fotoğrafın bilgisini göndermiş olacağuk
+  res.render('photo', {
+    photo,
+  });
+});
+
 app.get('/about', (req, res) => {
   res.render('about');
 });
