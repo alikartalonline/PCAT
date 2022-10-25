@@ -1,6 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const fileUpload = require('express-fileupload');
 
+const fs = require('fs');
 const ejs = require('ejs');
 const path = require('path');
 const Photo = require('./models/Photo');
@@ -17,6 +19,7 @@ app.set('view engine', 'ejs');
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(fileUpload());
 
 // express.urlencoded() = Url'deki datayı okumamızı sağlıyor
 // express.json() = Url'deki datayı json formatına dönüştürmemizi sağlıyor
@@ -37,9 +40,11 @@ app.get('/', (req, res) => {
   res.render('index');
 });
 */
+
 app.get('/', async (req, res) => {
   // bu "photos", veritabanımdaki fotoğrafları gösterecek
-  const photos = await Photo.find({});
+  const photos = await Photo.find({}).sort('-dateCreated')
+  // sort('-dateCreated') = sıralamayı "dateCreated"e göre yapacak ve en son yüklenen, başa gelmesi içinde başına "-" koyuyoruz!
 
   // ilgili template'e fotoğrafları göndermek için:
   res.render('index', {
@@ -84,8 +89,42 @@ app.post('/photos', (req, res) => {
 });
 */
 app.post('/photos', async (req, res) => {
-  await Photo.create(req.body);
-  res.redirect('/');
+  // console.log(req.files.image); // yüklediğim görselle ilgili tüm bilgilere ulaşabilirim
+  // neden image? => Çünkü bizim formumuzda görselimizin name attribute'u image olduğu için (type="file" name="image")
+
+  // await Photo.create(req.body);
+  // res.redirect('/');
+
+  const uploadDir = 'public/uploads';
+
+  // fs.existSync() = Dosyanın/Klasörün olup, olmadığını bu şekilde kontrol ediyoruz
+  // fs.mkdirSync = Klasör oluşturma
+  // Neden Sync ?? = Çünkü bunu önceden yapmasını istiyorum, yani asenkron değil, aşağıda işlemlere geçsin istemiyorum.
+  // Önce klasörün olup olmadığını kontrol et, ondan sonra aşağıdaki işlemlere geç!
+
+  // Eğer bu dosya (UploadDir) yoksa (!) oluştur:
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir);
+  }
+
+  let uploadImage = req.files.image; // görselle ilgili bilgiler
+  let uploadPath = __dirname + '/public/uploads/' + uploadImage.name;
+  // uploadPath = Ben bu "public" içerisinde "uploads" adında bir klasör oluşmasını istiyorum
+  // ve bu "/publics/uploads/" klasörünün içine de görsellerin gitmesini istiyorum
+  // ___dirname = var olan klasörün kendisini gösterir
+
+  // Benim yüklemesini istediğim klasöre "mv" etmesi için, o klasöre eklemesi için:
+  // İlk parametre olarak nereye eklemesi gerektiğini söylüyorum: uploadPath
+  // İkinci parametre de istediğimiz klasöre ekleme yapacak, farklı klasöre gönderdi ve o gönderirken şurada da şunu diyorum:
+  // "image: '/uploads/' + uploadImage.name," = Görselin yolunu bana bildir ki ben bu görsel yolunu sonradan veritabanına kaydedebileyim.
+  // "MongoDB Compass" aracımızda <image=''> bölümüne ekleniyor yani.
+  uploadImage.mv(uploadPath, async () => {
+    await Photo.create({
+      ...req.body,
+      image: '/uploads/' + uploadImage.name,
+    });
+    res.redirect('/'); // işlemi tamamladıktan sonra redirect olarak ana sayfaya yönlenecek
+  });
 });
 
 const port = 3333;
