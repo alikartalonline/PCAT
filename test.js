@@ -6,7 +6,7 @@ const Schema = mongoose.Schema;
 // mongoose.connect('mongodb://localhost/pcat-test-db');
 // mongoose.connect('mongodb://localhost:27017/pcat-test-db');
 // mongoose v6 ile birlikte deprecation warning artık gelmiyor.
-// "useNewUrlParser" ve "useUnifiedTopology" yazmamıza gerek yok.
+// "useNewUrlParser: true" ve "useUnifiedTopology: true" ve "useFindAndMofiy: false" yazmamıza gerek yok.
 mongoose.connect('mongodb://127.0.0.1:27017/pcat-test-db');
 
 // Create Schema

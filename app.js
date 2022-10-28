@@ -21,7 +21,12 @@ app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(fileUpload());
-app.use(methodOverride('_method'));
+app.use(
+  methodOverride('_method', {
+    // gerektiğinde hangi methodların Override edilmesini ayrıca belirtmemiz gerekiyor:
+    methods: ['POST', 'GET'],
+  })
+);
 
 // express.urlencoded() = Url'deki datayı okumamızı sağlıyor
 // express.json() = Url'deki datayı json formatına dönüştürmemizi sağlıyor
@@ -147,7 +152,20 @@ app.put('/photos/:id', async (req, res) => {
   photo.description = req.body.description;
   photo.save();
 
-  await res.redirect(`/photos/${req.params.id}`) // id'yi params'dan yakalıyoruz
+  await res.redirect(`/photos/${req.params.id}`); // id'yi params'dan yakalıyoruz
+});
+
+app.delete('/photos/:id', async (req, res) => {
+  //console.log(req.params.id) // silmek istediğim id'yi yakaladım ve console'a yazdırdım
+
+  const photo = await Photo.findOne({ _id: req.params.id });
+  let deleteImage = __dirname + '/public' + photo.image; 
+  // _id'si parametreden gelen ["app.delete('/photos/:id'..."] req.params.id olan fotoğrafı bul diyoruz
+
+  fs.unlinkSync(deleteImage);
+  // senkron işlem yapmasını istiyorum çünkü buradaki silme işlemini yapmadan  (public/uploads klasörünün içindeki image'i silmek) bir alttaki satıra geçmesini istemiyorum
+  await Photo.findByIdAndRemove(req.params.id); // içeriği siliyoruz
+  res.redirect(`/`); // silme işlemi olunca direkt olarak anasayfaya dön
 });
 
 const port = 3333;
