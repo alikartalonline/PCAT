@@ -3,10 +3,16 @@ const mongoose = require('mongoose');
 const fileUpload = require('express-fileupload');
 const methodOverride = require('method-override');
 
+// controller dosyamızda oldukları için bunlara app.js içinde gerek yok artık
+/*
 const fs = require('fs');
-const ejs = require('ejs');
-const path = require('path');
 const Photo = require('./models/Photo');
+const path = require('path');
+*/
+
+const ejs = require('ejs');
+const photoController = require('./controllers/photoControllers');
+const pageController = require('./controllers/pageController');
 
 const app = express();
 
@@ -48,6 +54,9 @@ app.get('/', (req, res) => {
 });
 */
 
+/*
+// NOT: './controllers/photoControllers' dosyasını açtığım için bu bölümü aşağıdaki bölüm ile değiştirdim.
+
 app.get('/', async (req, res) => {
   // bu "photos", veritabanımdaki fotoğrafları gösterecek
   const photos = await Photo.find({}).sort('-dateCreated');
@@ -59,6 +68,10 @@ app.get('/', async (req, res) => {
     photos,
   });
 });
+*/
+
+/*
+// NOT: './controllers/photoControllers' dosyasını açtığım için bu bölümü aşağıdaki bölüm ile değiştirdim.
 
 app.get('/photos/:id', async (req, res) => {
   // console.log(req.params.id); // id'yi console'a yazdırdık
@@ -72,7 +85,13 @@ app.get('/photos/:id', async (req, res) => {
     photo,
   });
 });
+*/
 
+// ROUTES
+app.get('/', photoController.getAllPhotos);
+app.get('/photos/:id', photoController.getPhoto);
+
+/*
 app.get('/about', (req, res) => {
   res.render('about');
 });
@@ -80,6 +99,10 @@ app.get('/about', (req, res) => {
 app.get('/add', (req, res) => {
   res.render('add');
 });
+*/
+
+app.get('/about', pageController.getAboutPage);
+app.get('/add', pageController.getAddPage);
 
 // views/add.ejs dosyamızdaki form'un action="/photos" bölümündeki yönlendirmeyi burada yakalıyorum
 // Daha sonrada yapması gereken işlemi söylüyorum:
@@ -95,6 +118,7 @@ app.post('/photos', (req, res) => {
   // index'e ('/') yani ana sayfaya tekrardan gitmesini söylüyorum.
 });
 */
+/*
 app.post('/photos', async (req, res) => {
   // console.log(req.files.image); // yüklediğim görselle ilgili tüm bilgilere ulaşabilirim
   // neden image? => Çünkü bizim formumuzda görselimizin name attribute'u image olduğu için (type="file" name="image")
@@ -133,8 +157,13 @@ app.post('/photos', async (req, res) => {
     res.redirect('/'); // işlemi tamamladıktan sonra redirect olarak ana sayfaya yönlenecek
   });
 });
+*/
+
+app.post('/photos', photoController.createPhoto);
+
 
 // "Edit The Photo" sayfası
+/*
 app.get('/photos/edit/:id', async (req, res) => {
   const photo = await Photo.findOne({ _id: req.params.id });
 
@@ -142,9 +171,12 @@ app.get('/photos/edit/:id', async (req, res) => {
     photo,
   });
 });
+*/
+app.get('/photos/edit/:id', pageController.getEditPage);
 
 // Anasayfa > içerik > "Update Details" içindeki "Edit The Photo"
 // bölümündeki verilerle alakalı olan fotoğrafın verilerini güncelleyeceğiz
+/*
 app.put('/photos/:id', async (req, res) => {
   const photo = await Photo.findOne({ _id: req.params.id });
 
@@ -154,12 +186,15 @@ app.put('/photos/:id', async (req, res) => {
 
   await res.redirect(`/photos/${req.params.id}`); // id'yi params'dan yakalıyoruz
 });
+*/
+app.put('/photos/:id', photoController.updatePhoto);
 
+/*
 app.delete('/photos/:id', async (req, res) => {
   //console.log(req.params.id) // silmek istediğim id'yi yakaladım ve console'a yazdırdım
 
   const photo = await Photo.findOne({ _id: req.params.id });
-  let deleteImage = __dirname + '/public' + photo.image; 
+  let deleteImage = __dirname + '/public' + photo.image;
   // _id'si parametreden gelen ["app.delete('/photos/:id'..."] req.params.id olan fotoğrafı bul diyoruz
 
   fs.unlinkSync(deleteImage);
@@ -167,6 +202,8 @@ app.delete('/photos/:id', async (req, res) => {
   await Photo.findByIdAndRemove(req.params.id); // içeriği siliyoruz
   res.redirect(`/`); // silme işlemi olunca direkt olarak anasayfaya dön
 });
+*/
+app.delete('/photos/:id', photoController.deletePhoto);
 
 const port = 3333;
 
