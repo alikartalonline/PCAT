@@ -73,14 +73,25 @@
 
                     <!-- Catalog Paging Buttons -->
                     <div>
+                    <% if (pages > 0) { %>
+                        <!-- değişken olmadığı için "=" koymamıza gerek yok -->
                         <ul class="nav tm-paging-links">
-                            <li class="nav-item active"><a href="#" class="nav-link tm-paging-link">1</a></li>
-                            <li class="nav-item"><a href="#" class="nav-link tm-paging-link">2</a></li>
-                            <li class="nav-item"><a href="#" class="nav-link tm-paging-link">3</a></li>
-                            <li class="nav-item"><a href="#" class="nav-link tm-paging-link">4</a></li>
-                            <li class="nav-item"><a href="#" class="nav-link tm-paging-link">></a></li>
-                        </ul>
+                        <%  for (i = 1; i <= pages; i++) {  %>
+                            <% if (i == current) { %>
+                                <li class="nav-item active"><a href="/?pages=<%= i %>" class="nav-link tm-paging-link"><%= i %><a><li>
+                                <% } else if (i < pages) { %>
+                                    <li class="nav-item"><a href="/?pages=<%= i %>" class="nav-link tm-paging-link"><%= i%></a></li>
+                                    <% } else { %>
+                                        <li class="nav-item"><a href="/?pages=<%= i %>" class="nav-link tm-paging-link">><a></li>
+                                    <% } %>
+                                <% } %>
+                        </ul
+                    <% } %>
                     </div>
+
+
+
+
                 </main>
 
                 <%- include('partials/_footer') -%>
